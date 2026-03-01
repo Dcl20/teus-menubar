@@ -65,7 +65,7 @@ app.whenReady().then(() => {
   registerShortcut();
   ipcMain.on('hide-window', () => hideWindow());
   ipcMain.on('open-external', (_e, url) => {
-    if (typeof url === 'string' && url.startsWith('https://teus.app')) {
+    if (typeof url === 'string' && url.startsWith('https://teuss.app')) {
       require('electron').shell.openExternal(url);
     }
   });
@@ -112,7 +112,7 @@ function createTray() {
     { label: `Abrir (${shortcut})`, click: () => toggleWindow() },
     { type: 'separator' },
     { label: 'Reiniciar', click: () => {
-      if (win && !win.isDestroyed()) win.loadURL('https://teus.app/exam');
+      if (win && !win.isDestroyed()) win.loadURL('https://teuss.app/exam');
     }},
     { type: 'separator' },
     { label: 'Salir', click: () => app.exit(0) },
@@ -194,7 +194,7 @@ function createWindow() {
   }
 
   // Always start on /exam directly — never show the full website
-  win.loadURL('https://teus.app/exam');
+  win.loadURL('https://teuss.app/exam');
 
   // After each page load, ensure we stay on /exam or show connect screen
   win.webContents.on('did-finish-load', () => {
@@ -228,7 +228,7 @@ function createWindow() {
 
   // Let /exam links navigate inside the window; everything else opens in browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.includes('teus.app/exam')) {
+    if (url.includes('teuss.app/exam')) {
       win.loadURL(url);
     } else {
       require('electron').shell.openExternal(url);
@@ -316,10 +316,10 @@ function showConnectScreen() {
   <div class="subtitle">by TEUS</div>
   <div class="instructions">
     <div class="step">Para conectar tu cuenta:</div>
-    <div class="step">1. Abre <strong>teus.app</strong> en tu navegador</div>
+    <div class="step">1. Abre <strong>teuss.app</strong> en tu navegador</div>
     <div class="step">2. Haz clic en <strong>"Conectar mi cuenta"</strong></div>
     <div class="step">3. Quick se conectara automaticamente</div>
-    <a class="link" href="https://teus.app" target="_blank">Abrir teus.app</a>
+    <a class="link" href="https://teuss.app" target="_blank">Abrir teuss.app</a>
   </div>
   <div class="shortcut">${shortcut} para abrir/cerrar</div>
 </body>
@@ -495,7 +495,7 @@ function handleProtocolUrl(url) {
       return;
     }
 
-    win.loadURL(`https://teus.app/exam?quick_auth=${encodeURIComponent(sanitized)}`);
+    win.loadURL(`https://teuss.app/exam?quick_auth=${encodeURIComponent(sanitized)}`);
     if (panelModule) {
       win.showInactive();
       panelModule.makeKeyWindow(win);
