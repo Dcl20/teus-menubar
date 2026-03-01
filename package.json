@@ -1,0 +1,96 @@
+{
+  "name": "teus-quick",
+  "version": "1.7.0",
+  "description": "TEUS Quick - Menu bar app para respuestas rápidas",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac",
+    "build:dmg": "electron-builder --mac dmg",
+    "build:zip": "electron-builder --mac zip",
+    "build:win": "electron-builder --win"
+  },
+  "build": {
+    "directories": {
+      "output": "./dist"
+    },
+    "protocols": [
+      {
+        "name": "TEUS Quick Auth",
+        "schemes": [
+          "teus-quick"
+        ]
+      }
+    ],
+    "appId": "app.teus.quick",
+    "productName": "TEUS Quick",
+    "artifactName": "TEUS.Quick-${version}-${arch}.${ext}",
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "assets/icon.png",
+      "target": [
+        "dmg"
+      ],
+      "identity": "diego calderon (75TCB2YURF)",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
+      "entitlements": "entitlements.plist",
+      "entitlementsInherit": "entitlements.plist"
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "shortcutName": "TEUS Quick"
+    },
+    "afterPack": "./scripts/afterPack.js",
+    "afterSign": "./scripts/notarize.js",
+    "dmg": {
+      "title": "TEUS Quick",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "assets/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "dcl20",
+      "repo": "teus-menubar"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "optionalDependencies": {
+    "@ashubashir/electron-panel-window": "^1.0.12"
+  },
+  "devDependencies": {
+    "@electron/notarize": "^3.1.1",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
