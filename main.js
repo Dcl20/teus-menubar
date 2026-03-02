@@ -130,7 +130,7 @@ async function captureScreenshot() {
   try {
     if (process.platform === 'darwin') {
       const status = systemPreferences.getMediaAccessStatus('screen');
-      if (status === 'denied') return null;
+      if (status !== 'granted') return null;
     }
     const sources = await desktopCapturer.getSources({
       types: ['screen'],
