@@ -351,13 +351,13 @@ function showConnectScreen() {
     cursor: pointer;
     -webkit-app-region: no-drag;
   }
-  .link:hover { background: #002266; }
+  .link:hover { background: #e67700; }
   .shortcut { font-size: 11px; color: #555; margin-top: 24px; }
 </style>
 </head>
 <body>
   <div class="logo"><span>quick</span></div>
-  <div class="subtitle">by TEUS</div>
+  <div class="subtitle">by Leonel</div>
   <div class="instructions">
     <div class="step">Para conectar tu cuenta:</div>
     <div class="step">1. Abre <strong>leonel.app</strong> en tu navegador</div>
@@ -440,10 +440,10 @@ function injectUI() {
 
         document.addEventListener('dragenter', function(e) {
           e.preventDefault();
-          if (!document.getElementById('teus-drop-overlay')) {
+          if (!document.getElementById('leonel-drop-overlay')) {
             var overlay = document.createElement('div');
-            overlay.id = 'teus-drop-overlay';
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(0,51,160,0.1);border:2px dashed rgba(0,51,160,0.5);border-radius:16px;display:flex;align-items:center;justify-content:center;pointer-events:none';
+            overlay.id = 'leonel-drop-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(255,131,0,0.1);border:2px dashed rgba(255,131,0,0.5);border-radius:16px;display:flex;align-items:center;justify-content:center;pointer-events:none';
             overlay.innerHTML = '<div style="background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:10px;color:#FF8300;font-size:13px;font-weight:600">Suelta la imagen aqui</div>';
             document.body.appendChild(overlay);
           }
@@ -451,13 +451,13 @@ function injectUI() {
 
         document.addEventListener('dragleave', function(e) {
           if (e.relatedTarget === null || e.relatedTarget === document.documentElement) {
-            var ov = document.getElementById('teus-drop-overlay');
+            var ov = document.getElementById('leonel-drop-overlay');
             if (ov) ov.remove();
           }
         });
 
         document.addEventListener('drop', function() {
-          var ov = document.getElementById('teus-drop-overlay');
+          var ov = document.getElementById('leonel-drop-overlay');
           if (ov) ov.remove();
         });
       }
@@ -485,7 +485,7 @@ async function toggleWindow() {
   const screenshot = await captureScreenshot();
   lastScreenshot = screenshot;
 
-  // 2. Now show the TEUS window at saved position (or default)
+  // 2. Now show the Leonel window at saved position (or default)
   const saved = loadBounds();
   const defaults = getDefaultPosition();
   const bounds = saved || { x: defaults.x, y: defaults.y, width: 340, height: 280 };
