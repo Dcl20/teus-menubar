@@ -28,36 +28,6 @@ let pendingAuthUrl = null;
 // --- Window bounds persistence ---
 const boundsFile = path.join(app.getPath('userData'), 'window-bounds.json');
 
-// --- Opacidad de la ventana ---
-//
-// Cuanto se transparenta el panel entero, contenido incluido. Es distinto de
-// `vibrancy`, que solo afecta al fondo: esto tambien afecta al texto, asi que
-// hay un piso. Por debajo de OPACIDAD_MINIMA el texto deja de leerse comodo y
-// la ventana no sirve para lo que existe.
-const OPACIDAD_MINIMA = 0.35;
-const OPACIDAD_MAXIMA = 1;
-const OPACIDAD_PASO = 0.05;
-const opacidadFile = path.join(app.getPath('userData'), 'opacidad.json');
-
-function cargarOpacidad() {
-  try {
-    const v = JSON.parse(fs.readFileSync(opacidadFile, 'utf8')).opacidad;
-    if (typeof v === 'number' && v >= OPACIDAD_MINIMA && v <= OPACIDAD_MAXIMA) return v;
-  } catch (e) {}
-  return OPACIDAD_MAXIMA;
-}
-
-let opacidad = OPACIDAD_MAXIMA;
-
-function aplicarOpacidad(valor) {
-  opacidad = Math.min(OPACIDAD_MAXIMA, Math.max(OPACIDAD_MINIMA, Math.round(valor * 100) / 100));
-  if (win && !win.isDestroyed()) win.setOpacity(opacidad);
-  try {
-    fs.writeFileSync(opacidadFile, JSON.stringify({ opacidad }));
-  } catch (e) {}
-  return opacidad;
-}
-
 function loadBounds() {
   try {
     return JSON.parse(fs.readFileSync(boundsFile, 'utf8'));
@@ -203,18 +173,8 @@ function createWindow() {
     skipTaskbar: true,
     alwaysOnTop: true,
     hasShadow: true,
-    // Sin fondo propio: lo pinta el material de macOS (vibrancy), que toma el
-    // color y el desenfoque de lo que haya detras. Con un backgroundColor
-    // solido la ventana tapa el escritorio pase lo que pase en el CSS.
-    transparent: true,
-    backgroundColor: '#00000000',
+    backgroundColor: '#141414',
     roundedCorners: true,
-    // `under-window` es el material que usan Spotlight y las barras laterales
-    // del sistema. `visualEffectState: 'active'` lo mantiene encendido aunque
-    // la ventana no tenga el foco, que es lo normal en un panel de este tipo:
-    // sin eso, en cuanto tocas otra app el material se apaga y se ve un vidrio
-    // gris muerto.
-    ...(process.platform === 'darwin' ? { vibrancy: 'under-window', visualEffectState: 'active' } : {}),
     // macOS: titleBarStyle required by electron-panel-window module
     // Windows: toolbar type for no taskbar entry
     ...(process.platform === 'darwin' ? { titleBarStyle: 'customButtonsOnHover', closable: false } : {}),
@@ -225,10 +185,6 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
-  // La que quedo de la ultima vez. Va antes de mostrarla para que no aparezca
-  // opaca y "salte" al valor guardado a la vista.
-  aplicarOpacidad(cargarOpacidad());
 
   // macOS: convert to real NSPanel with nonactivatingPanel style mask.
   // This is what makes the window truly invisible to focus tracking.
@@ -371,26 +327,8 @@ function showConnectScreen() {
   `)}`);
 }
 
-// El vidrio de la ventana no se ve si la pagina pinta su propio fondo encima.
-//
-// `/exam` trae tres capas opacas apiladas —html, body y los dos contenedores
-// de pantalla completa— y cualquiera de ellas tapa el material de macOS por
-// completo. Se transparentan las de fuera y el panel de contenido se queda
-// con un fondo translucido: sobre el vidrio el texto necesita algo detras o
-// se pierde contra lo que haya en el escritorio.
-//
-// Va como CSS inyectado y no en leonel-web porque esto es la ventana de
-// Quick, no la pagina: en el navegador `/exam` debe seguir viendose solida.
-const CSS_VIDRIO = `
-  html, body { background: transparent !important; }
-  body > div { background: transparent !important; }
-  body > div > div { background: rgba(20, 20, 20, 0.55) !important; }
-`;
-
 function injectUI() {
   if (!win || win.isDestroyed()) return;
-
-  win.webContents.insertCSS(CSS_VIDRIO).catch(() => {});
 
   win.webContents.executeJavaScript(`
     (function() {
@@ -512,10 +450,6 @@ async function toggleWindow() {
 
 function registerShortcut() {
   globalShortcut.register('CommandOrControl+L', () => toggleWindow());
-  // Se ajusta a ojo y en el momento: la transparencia que se lee bien sobre un
-  // editor oscuro no es la misma que sobre una pagina blanca.
-  globalShortcut.register('CommandOrControl+Alt+Up', () => aplicarOpacidad(opacidad + OPACIDAD_PASO));
-  globalShortcut.register('CommandOrControl+Alt+Down', () => aplicarOpacidad(opacidad - OPACIDAD_PASO));
 }
 
 app.on('window-all-closed', (e) => e.preventDefault());
