@@ -1,7 +1,7 @@
 {
-  "name": "teus-quick",
+  "name": "leonel-quick",
   "version": "1.7.0",
-  "description": "TEUS Quick - Menu bar app para respuestas rápidas",
+  "description": "Leonel Quick - Menu bar app para respuestas rápidas",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -16,15 +16,15 @@
     },
     "protocols": [
       {
-        "name": "TEUS Quick Auth",
+        "name": "Leonel Quick Auth",
         "schemes": [
-          "teus-quick"
+          "leonel-quick"
         ]
       }
     ],
-    "appId": "app.teus.quick",
-    "productName": "TEUS Quick",
-    "artifactName": "TEUS.Quick-${version}-${arch}.${ext}",
+    "appId": "app.leonel.quick",
+    "productName": "Leonel Quick",
+    "artifactName": "Leonel.Quick-${version}-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.education",
       "icon": "assets/icon.png",
@@ -52,12 +52,12 @@
       "oneClick": true,
       "perMachine": false,
       "allowToChangeInstallationDirectory": false,
-      "shortcutName": "TEUS Quick"
+      "shortcutName": "Leonel Quick"
     },
     "afterPack": "./scripts/afterPack.js",
     "afterSign": "./scripts/notarize.js",
     "dmg": {
-      "title": "TEUS Quick",
+      "title": "Leonel Quick",
       "contents": [
         {
           "x": 130,
@@ -79,7 +79,7 @@
     "publish": {
       "provider": "github",
       "owner": "dcl20",
-      "repo": "teus-menubar"
+      "repo": "leonel-menubar"
     }
   },
   "dependencies": {

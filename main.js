@@ -11,10 +11,10 @@ if (process.platform === 'darwin') {
 
 // Global error handlers - log but don't crash
 process.on('uncaughtException', (err) => {
-  console.error('[teus-quick] Uncaught exception:', err.message);
+  console.error('[leonel-quick] Uncaught exception:', err.message);
 });
 process.on('unhandledRejection', (reason) => {
-  console.error('[teus-quick] Unhandled rejection:', reason);
+  console.error('[leonel-quick] Unhandled rejection:', reason);
 });
 
 const gotLock = app.requestSingleInstanceLock();
@@ -74,7 +74,7 @@ function saveBounds() {
 }
 
 // Register custom protocol (must be before ready)
-app.setAsDefaultProtocolClient('teus-quick');
+app.setAsDefaultProtocolClient('leonel-quick');
 
 // macOS: open-url can fire before app is ready
 app.on('open-url', (event, url) => {
@@ -95,7 +95,7 @@ app.whenReady().then(() => {
   registerShortcut();
   ipcMain.on('hide-window', () => hideWindow());
   ipcMain.on('open-external', (_e, url) => {
-    if (typeof url === 'string' && url.startsWith('https://teuss.app')) {
+    if (typeof url === 'string' && url.startsWith('https://leonel.app')) {
       require('electron').shell.openExternal(url);
     }
   });
@@ -117,7 +117,7 @@ app.whenReady().then(() => {
   }
 
   // Windows: check argv for protocol URL on first launch
-  const protocolArg = process.argv.find(a => a.startsWith('teus-quick://'));
+  const protocolArg = process.argv.find(a => a.startsWith('leonel-quick://'));
   if (protocolArg) handleProtocolUrl(protocolArg);
 });
 
@@ -135,14 +135,14 @@ function createTray() {
   }
 
   tray = new Tray(icon);
-  tray.setToolTip(`Quick by TEUS (${shortcut})`);
+  tray.setToolTip(`Quick by Leonel (${shortcut})`);
   tray.on('click', () => toggleWindow());
 
   const contextMenu = Menu.buildFromTemplate([
     { label: `Abrir (${shortcut})`, click: () => toggleWindow() },
     { type: 'separator' },
     { label: 'Reiniciar', click: () => {
-      if (win && !win.isDestroyed()) win.loadURL('https://teuss.app/exam');
+      if (win && !win.isDestroyed()) win.loadURL('https://leonel.app/exam');
     }},
     { type: 'separator' },
     { label: 'Salir', click: () => app.exit(0) },
@@ -238,7 +238,7 @@ function createWindow() {
   }
 
   // Always start on /exam directly — never show the full website
-  win.loadURL('https://teuss.app/exam');
+  win.loadURL('https://leonel.app/exam');
 
   // After each page load, ensure we stay on /exam or show connect screen
   win.webContents.on('did-finish-load', () => {
@@ -272,7 +272,7 @@ function createWindow() {
 
   // Let /exam links navigate inside the window; everything else opens in browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.includes('teuss.app/exam')) {
+    if (url.includes('leonel.app/exam')) {
       win.loadURL(url);
     } else {
       require('electron').shell.openExternal(url);
@@ -324,7 +324,7 @@ function showConnectScreen() {
     user-select: none;
   }
   .logo { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-  .logo span { color: #0033A0; }
+  .logo span { color: #FF8300; }
   .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
   .instructions {
     -webkit-app-region: no-drag;
@@ -337,12 +337,12 @@ function showConnectScreen() {
     margin-bottom: 12px;
     line-height: 1.5;
   }
-  .step strong { color: #0033A0; }
+  .step strong { color: #FF8300; }
   .link {
     display: inline-block;
     margin-top: 8px;
     padding: 8px 20px;
-    background: #0033A0;
+    background: #FF8300;
     color: #000;
     border-radius: 8px;
     text-decoration: none;
@@ -360,10 +360,10 @@ function showConnectScreen() {
   <div class="subtitle">by TEUS</div>
   <div class="instructions">
     <div class="step">Para conectar tu cuenta:</div>
-    <div class="step">1. Abre <strong>teuss.app</strong> en tu navegador</div>
+    <div class="step">1. Abre <strong>leonel.app</strong> en tu navegador</div>
     <div class="step">2. Presiona el <strong>rayito ⚡</strong> abajo a la derecha</div>
     <div class="step">3. Haz clic en <strong>"Conectar mi cuenta"</strong></div>
-    <a class="link" href="https://teuss.app" target="_blank">Abrir teuss.app</a>
+    <a class="link" href="https://leonel.app" target="_blank">Abrir leonel.app</a>
   </div>
   <div class="shortcut">${shortcut} para abrir/cerrar</div>
 </body>
@@ -395,24 +395,24 @@ function injectUI() {
   win.webContents.executeJavaScript(`
     (function() {
       // --- Drag bar (just for moving, no buttons) ---
-      if (!document.getElementById('teus-bar')) {
+      if (!document.getElementById('leonel-bar')) {
         var bar = document.createElement('div');
-        bar.id = 'teus-bar';
+        bar.id = 'leonel-bar';
         bar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:24px;-webkit-app-region:drag;z-index:99999;background:transparent;cursor:grab';
         document.body.prepend(bar);
       }
 
       // --- Escape to hide ---
-      if (!window._teusKeys) {
-        window._teusKeys = true;
+      if (!window._leonelKeys) {
+        window._leonelKeys = true;
         document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && window.teus) window.teus.hide();
+          if (e.key === 'Escape' && window.leonel) window.leonel.hide();
         });
       }
 
       // --- Drag & drop images ---
-      if (!window._teusDrop) {
-        window._teusDrop = true;
+      if (!window._leonelDrop) {
+        window._leonelDrop = true;
 
         document.addEventListener('dragover', function(e) {
           e.preventDefault();
@@ -444,7 +444,7 @@ function injectUI() {
             var overlay = document.createElement('div');
             overlay.id = 'teus-drop-overlay';
             overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(0,51,160,0.1);border:2px dashed rgba(0,51,160,0.5);border-radius:16px;display:flex;align-items:center;justify-content:center;pointer-events:none';
-            overlay.innerHTML = '<div style="background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:10px;color:#0033A0;font-size:13px;font-weight:600">Suelta la imagen aqui</div>';
+            overlay.innerHTML = '<div style="background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:10px;color:#FF8300;font-size:13px;font-weight:600">Suelta la imagen aqui</div>';
             document.body.appendChild(overlay);
           }
         });
@@ -528,7 +528,7 @@ app.on('will-quit', () => {
 });
 app.on('second-instance', (_event, argv) => {
   // Windows: protocol URL comes in argv of second instance
-  const protocolArg = argv.find(a => a.startsWith('teus-quick://'));
+  const protocolArg = argv.find(a => a.startsWith('leonel-quick://'));
   if (protocolArg) {
     handleProtocolUrl(protocolArg);
   } else {
@@ -538,17 +538,17 @@ app.on('second-instance', (_event, argv) => {
 
 function handleProtocolUrl(url) {
   try {
-    if (typeof url !== 'string' || !url.startsWith('teus-quick://')) {
-      console.warn('[teus-quick] Invalid protocol URL format');
+    if (typeof url !== 'string' || !url.startsWith('leonel-quick://')) {
+      console.warn('[leonel-quick] Invalid protocol URL format');
       return;
     }
 
     const parsed = new URL(url);
-    if (parsed.protocol !== 'teus-quick:') return;
+    if (parsed.protocol !== 'leonel-quick:') return;
 
     const refreshToken = parsed.searchParams.get('rt');
     if (!refreshToken || refreshToken.length < 10 || refreshToken.length > 4096) {
-      console.warn('[teus-quick] Invalid or missing refresh token');
+      console.warn('[leonel-quick] Invalid or missing refresh token');
       return;
     }
 
@@ -557,11 +557,11 @@ function handleProtocolUrl(url) {
     // Whitelist: only allow alphanumeric, hyphens, underscores, dots
     const sanitized = refreshToken.replace(/[^a-zA-Z0-9._-]/g, '');
     if (!sanitized || sanitized.length < 10) {
-      console.warn('[teus-quick] Token failed sanitization');
+      console.warn('[leonel-quick] Token failed sanitization');
       return;
     }
 
-    win.loadURL(`https://teuss.app/exam?quick_auth=${encodeURIComponent(sanitized)}`);
+    win.loadURL(`https://leonel.app/exam?quick_auth=${encodeURIComponent(sanitized)}`);
     if (panelModule) {
       win.showInactive();
       panelModule.makeKeyWindow(win);
@@ -570,6 +570,6 @@ function handleProtocolUrl(url) {
       win.focus();
     }
   } catch (e) {
-    console.error('[teus-quick] Protocol handler error:', e.message);
+    console.error('[leonel-quick] Protocol handler error:', e.message);
   }
 }
