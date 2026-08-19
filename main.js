@@ -145,6 +145,16 @@ function createTray() {
       if (win && !win.isDestroyed()) win.loadURL('https://leonel.app/exam');
     }},
     { type: 'separator' },
+    // El mismo ajuste que los atajos, pero visible. Los atajos globales se los
+    // puede haber quedado otra app y entonces no hacen nada; este menu siempre
+    // esta, y de paso enseña que la opcion existe.
+    { label: 'Transparencia', submenu: [
+      { label: 'Solida', type: 'radio', click: () => aplicarOpacidad(1) },
+      { label: 'Ligera (85%)', type: 'radio', click: () => aplicarOpacidad(0.85) },
+      { label: 'Media (65%)', type: 'radio', click: () => aplicarOpacidad(0.65) },
+      { label: 'Maxima (35%)', type: 'radio', click: () => aplicarOpacidad(OPACIDAD_MINIMA) },
+    ]},
+    { type: 'separator' },
     { label: 'Salir', click: () => app.exit(0) },
   ]);
   tray.on('right-click', () => tray.popUpContextMenu(contextMenu));
@@ -206,7 +216,11 @@ function createWindow() {
     // Sin fondo propio: lo pinta el material de macOS (vibrancy), que toma el
     // color y el desenfoque de lo que haya detras. Con un backgroundColor
     // solido la ventana tapa el escritorio pase lo que pase en el CSS.
-    transparent: true,
+    //
+    // OJO: aqui NO va `transparent: true`. Con la ventana marcada transparente
+    // macOS no instala la vista de efecto visual y el vibrancy no se aplica:
+    // se ve un gris plano, que fue justo el primer intento. Un
+    // backgroundColor con alfa 0 basta para que la pagina no tape el material.
     backgroundColor: '#00000000',
     roundedCorners: true,
     // `under-window` es el material que usan Spotlight y las barras laterales
@@ -234,7 +248,15 @@ function createWindow() {
   // This is what makes the window truly invisible to focus tracking.
   if (panelModule) {
     panelModule.makePanel(win);
-    win.setContentProtection(true); // hide from screen capture APIs
+    // Convertirla en NSPanel reemplaza la ventana nativa por debajo, asi que
+    // el material se vuelve a pedir despues: si se pidio solo al construirla,
+    // el cambio se lo lleva por delante y queda el gris.
+    if (process.platform === 'darwin') {
+      try { win.setVibrancy('under-window'); } catch (e) {}
+    }
+    // Fuera de la captura de pantalla. Se puede apagar para poder verificar el
+    // aspecto de la ventana con una captura: sin esto sale un hueco negro.
+    win.setContentProtection(process.env.QUICK_SIN_PROTECCION !== '1');
   }
 
   // Always start on /exam directly — never show the full website
@@ -514,8 +536,13 @@ function registerShortcut() {
   globalShortcut.register('CommandOrControl+L', () => toggleWindow());
   // Se ajusta a ojo y en el momento: la transparencia que se lee bien sobre un
   // editor oscuro no es la misma que sobre una pagina blanca.
-  globalShortcut.register('CommandOrControl+Alt+Up', () => aplicarOpacidad(opacidad + OPACIDAD_PASO));
-  globalShortcut.register('CommandOrControl+Alt+Down', () => aplicarOpacidad(opacidad - OPACIDAD_PASO));
+  // register() devuelve false cuando el atajo ya lo tiene otra app, y no lanza
+  // nada: sin este aviso, la tecla simplemente no hace nada y parece que la
+  // funcion no existe.
+  for (const [combo, delta] of [['CommandOrControl+Alt+Up', OPACIDAD_PASO], ['CommandOrControl+Alt+Down', -OPACIDAD_PASO]]) {
+    const ok = globalShortcut.register(combo, () => aplicarOpacidad(opacidad + delta));
+    if (!ok) console.error(`[leonel-quick] El atajo ${combo} ya lo tiene otra app; la opacidad se ajusta desde el menu de la barra.`);
+  }
 }
 
 app.on('window-all-closed', (e) => e.preventDefault());
